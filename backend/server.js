@@ -66,28 +66,31 @@ pollSocket.initialize();
 // Start server
 const PORT = process.env.PORT || 5000;
 
+// Initialize and start server
 const startServer = async () => {
   try {
     // Initialize database
     await initDatabase();
 
-    // Clean up duplicate participants and old data
+    // Clean up duplicates
     await participantService.cleanupDuplicates();
     
-    // Clear old votes and participants (for development)
-    const { pool } = require('./config/database');
-    await pool.query('DELETE FROM votes');
-    await pool.query('DELETE FROM participants');
-    await pool.query('DELETE FROM chat_messages');
-    
+    // Clear old data (development only)
+    if (process.env.NODE_ENV !== 'production') {
+      const { pool } = require('./config/database');
+      await pool.query('DELETE FROM votes');
+      await pool.query('DELETE FROM participants');
+      await pool.query('DELETE FROM chat_messages');
+    }
 
-    // Start listening
-    server.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+    // Start listening (Vercel handles this in production)
+    if (!process.env.VERCEL) {
+      server.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    }
   } catch (error) {
-    console.error(' Failed to start server:', error);
-    process.exit(1);
+    console.error('Failed to start server:', error);
   }
 };
 
@@ -106,5 +109,6 @@ process.on('SIGINT', () => {
   });
 });
 
-module.exports = { app, server, io };
+// Export for Vercel
+module.exports = server;
 
