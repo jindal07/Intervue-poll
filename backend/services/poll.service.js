@@ -39,8 +39,9 @@ class PollService {
 
     const formattedPoll = this.formatPoll(poll);
     
-    // Calculate remaining time
-    const elapsed = Math.floor((Date.now() - poll.start_time) / 1000);
+    // Calculate remaining time (convert start_time to number)
+    const startTime = parseInt(poll.start_time);
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
     const remainingTime = Math.max(0, poll.duration - elapsed);
     
     // Get vote counts
@@ -122,7 +123,8 @@ class PollService {
       return null;
     }
 
-    const elapsed = Math.floor((Date.now() - poll.start_time) / 1000);
+    const startTime = parseInt(poll.start_time);
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
     if (elapsed >= poll.duration) {
       return await this.completePoll(pollId);
     }

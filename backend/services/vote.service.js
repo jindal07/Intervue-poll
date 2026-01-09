@@ -17,8 +17,9 @@ class VoteService {
       throw new Error('This poll is no longer active');
     }
 
-    // Check if poll has expired
-    const elapsed = Math.floor((Date.now() - poll.start_time) / 1000);
+    // Check if poll has expired (convert start_time to number)
+    const startTime = parseInt(poll.start_time);
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
     if (elapsed >= poll.duration) {
       throw new Error('Poll time has expired');
     }
