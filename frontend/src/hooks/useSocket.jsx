@@ -9,13 +9,14 @@ export const useSocket = () => {
   const [connectionError, setConnectionError] = useState(null);
 
   useEffect(() => {
-    // Initialize socket connection
+    // Initialize socket connection (polling first for Vercel)
     socketRef.current = io(SOCKET_URL, {
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
-      reconnectionAttempts: 5
+      reconnectionAttempts: 10,
+      timeout: 20000
     });
 
     const socket = socketRef.current;
@@ -56,21 +57,21 @@ export const useSocket = () => {
     };
   }, []);
 
-  // Emit event (memoized to prevent infinite loops)
+  // Emit event 
   const emit = useCallback((event, data) => {
     if (socketRef.current && socketRef.current.connected) {
       socketRef.current.emit(event, data);
     }
   }, []);
 
-  // Listen to event (memoized)
+  // Listen to event 
   const on = useCallback((event, callback) => {
     if (socketRef.current) {
       socketRef.current.on(event, callback);
     }
   }, []);
 
-  // Remove listener (memoized)
+  // Remove listener 
   const off = useCallback((event, callback) => {
     if (socketRef.current) {
       socketRef.current.off(event, callback);

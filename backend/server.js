@@ -15,13 +15,18 @@ const participantService = require('./services/participant.service');
 const app = express();
 const server = http.createServer(app);
 
-// Socket.io configuration
+// Socket.io configuration 
 const io = new Server(server, {
   cors: {
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     methods: ['GET', 'POST'],
     credentials: true
-  }
+  },
+  //polling
+  transports: ['polling', 'websocket'],
+  allowEIO3: true,
+  pingTimeout: 60000,
+  pingInterval: 25000
 });
 
 // Middleware
